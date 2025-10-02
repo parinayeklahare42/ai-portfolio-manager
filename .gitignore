@@ -175,3 +175,9 @@ config.json
 AppData/
 *.lnk
 *.url
+
+# Project specific
+*.docx
+*.pdf
+image/
+portfolio_story/tests/data/
