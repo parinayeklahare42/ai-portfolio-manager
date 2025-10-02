@@ -1,6 +1,20 @@
 """
 The Portfolio Story - Main Portfolio Manager
-Orchestrates all components to create and manage portfolios
+============================================
+
+This is the central orchestrator of the AI-powered portfolio management system.
+It coordinates all components to create, analyze, and manage investment portfolios
+using advanced machine learning techniques.
+
+Key Responsibilities:
+- Orchestrates the entire portfolio creation workflow
+- Coordinates data fetching, analysis, and risk management
+- Manages portfolio state and rebalancing decisions
+- Provides comprehensive portfolio summaries and analytics
+
+Author: parinayeklahare42
+Course: 125882 AI in Investment and Risk Management
+Assignment: Assessment 2 Hackathon and Coding Challenge
 """
 
 import pandas as pd
@@ -9,6 +23,7 @@ from typing import Dict, List, Tuple, Optional
 import logging
 from datetime import datetime, timedelta
 
+# Import all system components
 from .data.librarian import Librarian
 from .models.research_crew import ResearchCrew
 from .models.planner import Planner
@@ -18,84 +33,140 @@ from .safety.risk_manager import RiskManager
 from .utils.shopkeeper import Shopkeeper
 from .utils.caretaker import Caretaker
 
-# Configure logging
+# Configure logging for debugging and monitoring
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class PortfolioManager:
     """
-    The main Portfolio Manager orchestrates all components:
-    1. The Librarian - Data fetching
-    2. The Research Crew - AI/ML analysis
-    3. The Planner - Asset allocation
-    4. The Selector - Asset selection
-    5. The Safety Officer - Risk management
-    6. The Risk Manager - Volatility targeting
-    7. The Shopkeeper - Trade execution
-    8. The Caretaker - Rebalancing
+    The main Portfolio Manager orchestrates all components of the AI portfolio system.
+    
+    This class serves as the central coordinator for the entire portfolio management workflow,
+    bringing together all specialized components to create intelligent, risk-managed portfolios.
+    
+    Component Architecture:
+    1. The Librarian - Fetches and caches market data from Yahoo Finance
+    2. The Research Crew - Performs AI/ML analysis (momentum, volatility, sentiment)
+    3. The Planner - Creates optimal asset allocation strategies
+    4. The Selector - Selects specific assets based on ML rankings
+    5. The Safety Officer - Applies risk management guardrails
+    6. The Risk Manager - Calculates advanced risk metrics (VaR, CVaR)
+    7. The Shopkeeper - Creates trade execution orders
+    8. The Caretaker - Handles portfolio rebalancing and maintenance
+    
+    The system uses a modular approach where each component has a specific responsibility,
+    making the code maintainable and allowing for easy testing and enhancement.
     """
     
     def __init__(self):
-        # Initialize all components
-        self.librarian = Librarian()
-        self.research_crew = ResearchCrew()
-        self.planner = Planner()
-        self.selector = Selector()
-        self.safety_officer = SafetyOfficer()
-        self.risk_manager = RiskManager()
-        self.shopkeeper = Shopkeeper()
-        self.caretaker = Caretaker()
+        """
+        Initialize the Portfolio Manager with all required components.
         
-        # Portfolio state
-        self.current_portfolio = None
-        self.last_rebalance_date = None
+        This constructor sets up the entire system by initializing all specialized
+        components that work together to create and manage portfolios.
+        """
+        # Initialize all AI/ML components
+        self.librarian = Librarian()          # Data fetching and caching
+        self.research_crew = ResearchCrew()    # AI/ML analysis engine
+        self.planner = Planner()              # Asset allocation strategist
+        self.selector = Selector()            # Asset selection algorithm
+        self.safety_officer = SafetyOfficer() # Risk management guardrails
+        self.risk_manager = RiskManager()     # Advanced risk analytics
+        self.shopkeeper = Shopkeeper()        # Trade execution system
+        self.caretaker = Caretaker()          # Portfolio maintenance
+        
+        # Portfolio state tracking
+        self.current_portfolio = None         # Currently active portfolio
+        self.last_rebalance_date = None        # Last rebalancing date
     
     def create_portfolio(self, time_horizon: str, budget: float, 
                         risk_budget: float = 0.10, sleep_better_dial: float = 0.0,
                         risk_profile: str = "moderate") -> Dict:
         """
-        Create a new portfolio based on user requirements
+        Create a new AI-optimized portfolio based on user requirements.
+        
+        This is the main method that orchestrates the entire portfolio creation workflow,
+        using advanced machine learning techniques to analyze assets, optimize allocation,
+        and manage risk according to modern portfolio theory principles.
+        
+        The process follows an 8-step workflow:
+        1. Data Fetching - Get real-time market data from Yahoo Finance
+        2. AI Analysis - Use ML algorithms to score and rank assets
+        3. Allocation Planning - Create optimal asset allocation strategy
+        4. Asset Selection - Choose specific assets based on ML rankings
+        5. Safety Checks - Apply risk management guardrails
+        6. Risk Management - Calculate advanced risk metrics
+        7. Trade Execution - Create detailed buy orders
+        8. Portfolio Summary - Compile comprehensive results
         
         Args:
-            time_horizon: 'short_term', 'medium_term', or 'long_term'
-            budget: Total investment amount
-            risk_budget: Target volatility (e.g., 0.10 for 10%)
-            sleep_better_dial: Risk adjustment (0-1, higher = more conservative)
-            risk_profile: 'conservative', 'moderate', or 'aggressive'
-            
+            time_horizon (str): Investment time horizon
+                - 'short_term': 1-2 years (higher equity allocation)
+                - 'medium_term': 3-5 years (balanced allocation)
+                - 'long_term': 5+ years (diversified allocation)
+            budget (float): Total investment amount in dollars
+            risk_budget (float): Target portfolio volatility (0.10 = 10% annual volatility)
+            sleep_better_dial (float): Risk adjustment factor (0-1)
+                - 0.0 = No adjustment (use default risk profile)
+                - 0.5 = Moderate risk reduction
+                - 1.0 = Maximum risk reduction (most conservative)
+            risk_profile (str): Base risk tolerance
+                - 'conservative': Lower risk, stable returns
+                - 'moderate': Balanced risk-return profile
+                - 'aggressive': Higher risk, potential for higher returns
+                
         Returns:
-            Complete portfolio with buy list and analysis
+            Dict: Complete portfolio dictionary containing:
+                - portfolio_id: Unique identifier
+                - parameters: User inputs and settings
+                - market_summary: Current market conditions
+                - allocation_plan: Asset allocation strategy
+                - analysis_results: ML analysis results for all assets
+                - selected_assets: Chosen assets with weights
+                - safety_results: Risk management outcomes
+                - risk_report: Advanced risk metrics (VaR, CVaR, etc.)
+                - buy_list: Detailed trade execution orders
+                - execution_summary: Trade summary and costs
+                
+        Raises:
+            Exception: If portfolio creation fails at any step
         """
         logger.info(f"Creating portfolio: {time_horizon}, ${budget:,.2f}, risk={risk_budget:.1%}")
         
         try:
-            # Step 1: Fetch data (The Librarian)
+            # Step 1: Data Fetching (The Librarian)
+            # Fetch real-time market data from Yahoo Finance with intelligent caching
             logger.info("Step 1: Fetching market data...")
-            all_data = self.librarian.get_all_data()
-            market_summary = self.librarian.get_market_summary()
+            all_data = self.librarian.get_all_data()  # Get data for all asset classes
+            market_summary = self.librarian.get_market_summary()  # Get market context
             
-            # Step 2: Analyze assets (The Research Crew)
+            # Step 2: AI/ML Analysis (The Research Crew)
+            # Use machine learning algorithms to analyze and score all assets
             logger.info("Step 2: Analyzing assets...")
             analysis_results = {}
             for asset_class, data_dict in all_data.items():
                 if data_dict:  # Only analyze if we have data
+                    # Perform comprehensive ML analysis on each asset class
                     analysis_results[asset_class] = self.research_crew.analyze_asset_class(
                         asset_class, data_dict
                     )
             
-            # Step 3: Create allocation plan (The Planner)
+            # Step 3: Allocation Planning (The Planner)
+            # Create optimal asset allocation strategy based on Modern Portfolio Theory
             logger.info("Step 3: Creating allocation plan...")
             allocation_plan = self.planner.create_portfolio_plan(
                 time_horizon, risk_profile, sleep_better_dial, risk_budget
             )
             
-            # Step 4: Select assets (The Selector)
+            # Step 4: Asset Selection (The Selector)
+            # Choose specific assets based on ML rankings and allocation targets
             logger.info("Step 4: Selecting assets...")
             selected_assets = self.selector.create_portfolio_selection(
                 analysis_results, allocation_plan['allocation']
             )
             
-            # Step 5: Safety checks (The Safety Officer)
+            # Step 5: Safety Checks (The Safety Officer)
+            # Apply risk management guardrails and safety measures
             logger.info("Step 5: Running safety checks...")
             safety_results = self.safety_officer.run_safety_checks(
                 allocation_plan['allocation'],
@@ -103,13 +174,15 @@ class PortfolioManager:
                 sleep_better_dial
             )
             
-            # Step 6: Risk management (The Risk Manager)
+            # Step 6: Risk Management (The Risk Manager)
+            # Calculate advanced risk metrics including VaR, CVaR, and stress testing
             logger.info("Step 6: Managing risk...")
             risk_report = self.risk_manager.generate_risk_report(
                 safety_results['final_allocation'], risk_budget
             )
             
-            # Step 7: Create buy list (The Shopkeeper)
+            # Step 7: Trade Execution (The Shopkeeper)
+            # Create detailed buy orders and calculate trade quantities
             logger.info("Step 7: Creating buy list...")
             dollar_amounts = self.shopkeeper.calculate_dollar_amounts(
                 safety_results['final_allocation'], budget
@@ -119,7 +192,8 @@ class PortfolioManager:
             )
             buy_list = self.shopkeeper.create_buy_list(trade_orders, budget)
             
-            # Step 8: Create portfolio summary
+            # Step 8: Portfolio Summary
+            # Compile all results into a comprehensive portfolio dictionary
             portfolio = {
                 'portfolio_id': f"PS_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
                 'created_at': datetime.now().isoformat(),
@@ -140,7 +214,7 @@ class PortfolioManager:
                 'execution_summary': self.shopkeeper.create_execution_summary(buy_list)
             }
             
-            # Store current portfolio
+            # Store current portfolio for future operations
             self.current_portfolio = portfolio
             
             logger.info("Portfolio creation completed successfully")
@@ -152,13 +226,24 @@ class PortfolioManager:
     
     def get_portfolio_summary(self, portfolio: Dict) -> str:
         """
-        Create human-readable portfolio summary
+        Create a comprehensive, human-readable portfolio summary.
+        
+        This method formats all portfolio information into a clear, structured summary
+        that includes key metrics, allocation details, risk analysis, and recommendations.
+        The summary is designed for easy reading and understanding by both technical
+        and non-technical users.
         
         Args:
-            portfolio: Portfolio dictionary
+            portfolio (Dict): Complete portfolio dictionary from create_portfolio()
             
         Returns:
-            Formatted summary string
+            str: Formatted summary string with:
+                - Portfolio identification and parameters
+                - Market context and conditions
+                - Asset allocation breakdown
+                - Risk metrics and analysis
+                - Buy list summary
+                - Safety messages and recommendations
         """
         summary = []
         summary.append("=" * 60)
@@ -228,13 +313,28 @@ class PortfolioManager:
     
     def check_rebalancing(self, current_allocation: Dict[str, float] = None) -> Dict:
         """
-        Check if portfolio needs rebalancing
+        Check if the current portfolio needs rebalancing based on drift analysis.
+        
+        This method compares the current portfolio allocation with the target allocation
+        to determine if rebalancing is necessary. It uses the Caretaker component to
+        analyze allocation drift and create a rebalancing plan if needed.
+        
+        Rebalancing is typically triggered when:
+        - Asset weights drift beyond acceptable thresholds (usually 5-10%)
+        - Market conditions change significantly
+        - Risk metrics exceed target levels
+        - Time-based rebalancing schedule is reached
         
         Args:
-            current_allocation: Current portfolio allocation
-            
+            current_allocation (Dict[str, float], optional): Current portfolio allocation
+                If None, uses the target allocation from the current portfolio
+                
         Returns:
-            Rebalancing analysis
+            Dict: Rebalancing analysis containing:
+                - action_needed: Boolean indicating if rebalancing is required
+                - drift_analysis: Analysis of allocation drift
+                - rebalance_plan: Detailed rebalancing strategy
+                - cost_analysis: Estimated rebalancing costs
         """
         if not self.current_portfolio:
             return {"error": "No current portfolio"}
@@ -255,14 +355,38 @@ class PortfolioManager:
     
     def get_leaderboard(self, asset_class: str = None, top_n: int = 10) -> pd.DataFrame:
         """
-        Get asset leaderboard
+        Get a ranked leaderboard of assets based on ML analysis scores.
+        
+        This method creates a leaderboard showing the top-performing assets based on
+        the comprehensive ML analysis performed by the Research Crew. Assets are ranked
+        by their composite score, which combines momentum, volatility, drawdown, and
+        sentiment analysis.
+        
+        The leaderboard is useful for:
+        - Understanding which assets scored highest in the analysis
+        - Comparing performance across different asset classes
+        - Identifying investment opportunities
+        - Portfolio optimization and selection
         
         Args:
-            asset_class: Specific asset class or None for all
-            top_n: Number of top assets to show
+            asset_class (str, optional): Specific asset class to filter by
+                - 'shares': Australian equities
+                - 'bonds': Fixed income securities
+                - 'commodities': Commodity investments
+                - 'crypto': Cryptocurrencies
+                - 'fx': Foreign exchange
+                - None: Include all asset classes
+            top_n (int): Number of top assets to include in the leaderboard
             
         Returns:
-            Leaderboard DataFrame
+            pd.DataFrame: Leaderboard with columns:
+                - ticker: Asset symbol
+                - current_price: Latest price
+                - composite_score: Overall ML score (0-1)
+                - momentum_score: Momentum analysis score
+                - volatility_score: Volatility analysis score
+                - drawdown_score: Drawdown analysis score
+                - sentiment_score: Sentiment analysis score
         """
         if not self.current_portfolio:
             return pd.DataFrame()
@@ -288,10 +412,30 @@ class PortfolioManager:
     
     def get_risk_dashboard(self) -> Dict:
         """
-        Get comprehensive risk dashboard
+        Get a comprehensive risk dashboard with advanced risk metrics.
+        
+        This method provides a detailed risk analysis dashboard that includes
+        portfolio volatility, risk attribution, Value at Risk (VaR), Conditional
+        Value at Risk (CVaR), and other advanced risk metrics. The dashboard
+        is designed for risk managers and sophisticated investors who need
+        detailed risk analysis.
+        
+        The risk dashboard includes:
+        - Portfolio volatility vs target volatility
+        - Risk attribution by asset class
+        - VaR and CVaR calculations
+        - Risk score and budget compliance
+        - Risk management recommendations
         
         Returns:
-            Risk dashboard data
+            Dict: Comprehensive risk dashboard containing:
+                - portfolio_volatility: Current portfolio volatility
+                - target_volatility: Target volatility from risk budget
+                - risk_attribution: Risk contribution by asset class
+                - var_metrics: VaR and CVaR calculations
+                - risk_score: Overall risk score (0-1)
+                - within_budget: Boolean indicating if within risk budget
+                - recommendations: Risk management recommendations
         """
         if not self.current_portfolio:
             return {"error": "No current portfolio"}
@@ -315,36 +459,75 @@ class PortfolioManager:
 
 # Example usage and testing
 if __name__ == "__main__":
-    # Initialize the Portfolio Manager
+    """
+    Example usage of the Portfolio Manager system.
+    
+    This section demonstrates how to use the AI Portfolio Management System
+    to create, analyze, and manage investment portfolios. The example shows
+    the complete workflow from portfolio creation to risk analysis.
+    
+    This code can be run directly to test the system functionality and
+    serves as a reference for integrating the system into other applications.
+    """
+    
+    # Initialize the Portfolio Manager with all AI/ML components
+    print("🤖 Initializing AI Portfolio Management System...")
     pm = PortfolioManager()
     
-    # Create a sample portfolio
-    print("Creating sample portfolio...")
+    # Create a sample portfolio using AI/ML optimization
+    print("\n📊 Creating AI-optimized portfolio...")
+    print("Parameters: Long-term horizon, $2,500 budget, 10% risk budget, moderate profile")
+    
     portfolio = pm.create_portfolio(
-        time_horizon="long_term",
-        budget=2500,
-        risk_budget=0.10,
-        sleep_better_dial=0.2,
-        risk_profile="moderate"
+        time_horizon="long_term",      # 5+ year investment horizon
+        budget=2500,                  # $2,500 investment amount
+        risk_budget=0.10,             # 10% target volatility
+        sleep_better_dial=0.2,        # Slight risk reduction
+        risk_profile="moderate"        # Balanced risk-return profile
     )
     
-    # Display summary
+    # Display comprehensive portfolio summary
+    print("\n📋 Portfolio Summary:")
+    print("=" * 60)
     summary = pm.get_portfolio_summary(portfolio)
     print(summary)
     
-    # Check rebalancing
-    print("\nChecking rebalancing...")
+    # Check if portfolio needs rebalancing
+    print("\n🔄 Checking rebalancing requirements...")
     rebalance = pm.check_rebalancing()
-    print(f"Rebalancing needed: {rebalance['action_needed']}")
+    print(f"Rebalancing needed: {rebalance.get('action_needed', 'Unknown')}")
     
-    # Get leaderboard
-    print("\nTop assets:")
+    # Get top-performing assets leaderboard
+    print("\n🏆 Top Performing Assets (ML Analysis):")
+    print("=" * 50)
     leaderboard = pm.get_leaderboard(top_n=5)
-    print(leaderboard)
+    if not leaderboard.empty:
+        print(leaderboard.to_string(index=False))
+    else:
+        print("No leaderboard data available")
     
-    # Get risk dashboard
-    print("\nRisk dashboard:")
+    # Get comprehensive risk dashboard
+    print("\n⚠️ Risk Dashboard:")
+    print("=" * 30)
     risk_dashboard = pm.get_risk_dashboard()
-    print(f"Portfolio volatility: {risk_dashboard['portfolio_volatility']:.1%}")
-    print(f"Risk score: {risk_dashboard['risk_score']:.2f}")
+    
+    if 'error' not in risk_dashboard:
+        print(f"Portfolio Volatility: {risk_dashboard['portfolio_volatility']:.1%}")
+        print(f"Target Volatility: {risk_dashboard['target_volatility']:.1%}")
+        print(f"Risk Score: {risk_dashboard['risk_score']:.2f}")
+        print(f"Within Risk Budget: {'Yes' if risk_dashboard['within_budget'] else 'No'}")
+        
+        if risk_dashboard.get('recommendations'):
+            print("\nRisk Management Recommendations:")
+            for rec in risk_dashboard['recommendations']:
+                print(f"  • {rec}")
+    else:
+        print(f"Risk dashboard error: {risk_dashboard['error']}")
+    
+    print("\n✅ AI Portfolio Management System demonstration completed!")
+    print("🎯 The system successfully created an AI-optimized portfolio with:")
+    print("   - Machine learning-based asset analysis")
+    print("   - Risk management and safety checks")
+    print("   - Comprehensive buy list and trade orders")
+    print("   - Advanced risk metrics and recommendations")
 
