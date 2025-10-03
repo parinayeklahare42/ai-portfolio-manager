@@ -1,50 +1,68 @@
 # Parinay Eklahare (25244462)
 
-# 🚀 AI Portfolio Manager - Complete Project Guide
+
+# 🚀 Enhanced AI Portfolio Manager - Complete Project Guide
 
 ## 📋 Project Overview
 
-**Project Title**: AI-Powered Investment Portfolio Management System
-**Purpose**: Advanced AI-driven investment portfolio optimization with interactive web dashboard
+**Project Title**: Enhanced AI-Powered Investment Portfolio Management System
+**Purpose**: Production-ready AI-driven investment portfolio optimization with comprehensive validation, user configuration, and advanced analytics
 **Live Demo**: [https://ai-portfolio-dashboard.onrender.com/](https://ai-portfolio-dashboard.onrender.com/)
 **GitHub Repository**: [https://github.com/parinayeklahare42/ai-portfolio-manager](https://github.com/parinayeklahare42/ai-portfolio-manager)
 
 ---
 
-## 🎯 Project Purpose & Objectives
+## 🎯 Enhanced Project Purpose & Objectives
 
-This project creates an intelligent investment portfolio management system that combines:
+This project creates an enterprise-grade intelligent investment portfolio management system that combines:
 
-- **AI/ML Techniques** for portfolio optimization and risk assessment
-- **Real-time Market Data** integration for live analysis
-- **Interactive Dashboard** for user-friendly portfolio management
-- **Risk Management** with advanced metrics and guardrails
-- **Professional Interface** suitable for both novice and expert investors
+- **Advanced AI/ML Techniques** with Markowitz mean-variance optimization and comprehensive validation
+- **User Configuration Management** for customizable asset selection and risk preferences
+- **Real-time Market Data** integration with data quality validation and intelligent caching
+- **Interactive Dashboard** with user customization and professional-grade analytics
+- **Comprehensive Risk Management** with VaR, CVaR, stress testing, and Monte Carlo simulation
+- **Advanced Logging & Monitoring** with audit trails and system health tracking
+- **Robust Validation Framework** ensuring data quality and calculation accuracy
+- **Professional Interface** suitable for institutional and retail investors
 
 ---
 
-## 🤖 AI/ML Techniques Used
+## 🤖 Enhanced AI/ML Techniques Used
 
-### 1. **Machine Learning Models**
+### 1. **Advanced Machine Learning Models**
 
-- **Random Forest Regressor**: For price prediction and risk assessment
-- **Gradient Boosting**: Enhanced portfolio optimization algorithms
+- **Random Forest Regressor**: Price prediction with comprehensive validation and error handling
+- **Gradient Boosting**: Enhanced portfolio optimization algorithms with performance monitoring
 - **Sentiment Analysis**: News and social media sentiment integration using TextBlob and NLTK
-- **Technical Analysis**: RSI, MACD, and volatility indicators
+- **Technical Analysis**: RSI, MACD, volatility indicators with statistical validation
+- **Monte Carlo Simulation**: Risk assessment and portfolio scenario analysis
 
-### 2. **Portfolio Optimization**
+### 2. **Markowitz Mean-Variance Optimization**
 
-- **Modern Portfolio Theory (MPT)**: Mean-variance optimization
-- **Risk-Return Analysis**: Sharpe ratio, VaR (Value at Risk), Expected Shortfall
-- **Asset Allocation**: Dynamic rebalancing based on market conditions
-- **Diversification Strategies**: Correlation analysis and sector allocation
+- **Expected Returns Calculation**: Historical data analysis with statistical validation
+- **Covariance Matrix Estimation**: Sample covariance with shrinkage methods for stability
+- **Sharpe Ratio Maximization**: Optimal risk-adjusted return optimization
+- **Minimum Variance Optimization**: Risk minimization strategies
+- **Target Volatility Optimization**: Risk targeting with user-defined preferences
+- **Portfolio Constraints**: Non-negative weights, sum to 1, optional cash allocation
 
-### 3. **Data Processing & Analysis**
+### 3. **Advanced Risk Analytics**
 
-- **Real-time Data Fetching**: Yahoo Finance API integration
-- **Caching System**: Intelligent data storage for performance
-- **Time Series Analysis**: Historical data processing and trend analysis
-- **Statistical Analysis**: Volatility, correlation, and performance metrics
+- **Value-at-Risk (VaR)**: Parametric and Monte Carlo VaR calculations
+- **Conditional VaR (CVaR)**: Expected shortfall and tail risk analysis
+- **Stress Testing**: Historical scenario analysis (2008 Crisis, COVID-19, etc.)
+- **Maximum Drawdown**: Peak-to-trough decline analysis with recovery metrics
+- **Tail Risk Metrics**: Skewness, kurtosis, and tail ratio calculations
+- **Risk Attribution**: Factor-based risk decomposition and analysis
+
+### 4. **Enhanced Data Processing & Analysis**
+
+- **Real-time Data Fetching**: Yahoo Finance API integration with quality validation
+- **Intelligent Caching System**: Performance optimization with data freshness checks
+- **Time Series Analysis**: Historical data processing with outlier detection
+- **Statistical Analysis**: Volatility, correlation, and performance metrics with validation
+- **Data Quality Monitoring**: Missing data detection, extreme value identification
+- **User Configuration**: Customizable asset universe and risk preferences
 
 ---
 

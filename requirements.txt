@@ -1,5 +1,5 @@
-# The Portfolio Story - Dependencies
-# AI-Powered Investment Management System
+# The Portfolio Story - Enhanced AI Portfolio Management System
+# Comprehensive Dependencies for Production-Ready Investment Management
 
 # Core Data Processing
 yfinance>=0.2.28          # Real-time market data from Yahoo Finance
@@ -11,6 +11,16 @@ scikit-learn>=1.4.0       # Machine learning algorithms
 textblob>=0.17.1          # Natural language processing and sentiment analysis
 nltk>=3.8.1               # Natural language toolkit
 scipy>=1.11.0             # Scientific computing for portfolio optimization
+
+# Enhanced Data Validation & Configuration
+dataclasses-json>=0.6.3   # JSON serialization for configuration objects
+pydantic>=2.0.0           # Data validation and settings management
+jsonschema>=4.17.0        # JSON schema validation
+
+# Advanced Statistics & Risk Analytics
+statsmodels>=0.14.0       # Statistical models and econometrics
+arch>=5.3.0               # ARCH/GARCH models for volatility modeling
+pyfolio>=0.9.2            # Portfolio and risk analytics (if available)
 
 # Visualization & Dashboard
 matplotlib>=3.8.0         # Static plotting
@@ -27,6 +37,14 @@ beautifulsoup4>=4.12.0    # HTML parsing for web scraping
 jupyter>=1.0.0            # Jupyter notebook for interactive analysis
 ipywidgets>=8.1.0         # Interactive widgets for Jupyter
 
+# Enhanced Logging & Monitoring
+structlog>=23.1.0         # Structured logging for better debugging
+colorama>=0.4.6           # Colored terminal output for logs
+
+# Configuration & Environment Management
+python-dotenv>=1.0.0      # Environment variable management
+configparser>=5.3.0       # Configuration file parsing
+
 # Additional dependencies for deployment
 gunicorn>=21.0.0          # WSGI server for production
 waitress>=2.1.0           # Alternative WSGI server
@@ -34,3 +52,5 @@ waitress>=2.1.0           # Alternative WSGI server
 # Optional: Additional packages for enhanced functionality
 # PyPDF2>=3.0.1           # PDF processing (for assignment content extraction)
 # python-docx>=0.8.11    # DOCX processing (for idea content extraction)
+# redis>=4.5.0            # Caching and session management (for production)
+# celery>=5.3.0           # Distributed task queue (for background processing)

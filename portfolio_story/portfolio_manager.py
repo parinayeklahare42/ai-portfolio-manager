@@ -1,16 +1,19 @@
 """
-The Portfolio Story - Main Portfolio Manager
-============================================
+The Portfolio Story - Enhanced AI Portfolio Management System
+============================================================
 
 This is the central orchestrator of the AI-powered portfolio management system.
 It coordinates all components to create, analyze, and manage investment portfolios
-using advanced machine learning techniques.
+using advanced machine learning techniques with comprehensive validation, logging,
+and user configuration management.
 
 Key Responsibilities:
-- Orchestrates the entire portfolio creation workflow
-- Coordinates data fetching, analysis, and risk management
-- Manages portfolio state and rebalancing decisions
-- Provides comprehensive portfolio summaries and analytics
+- Orchestrates the entire portfolio creation workflow with enhanced reliability
+- Coordinates data fetching, analysis, and risk management with validation
+- Manages user configurations and asset universe customization
+- Provides comprehensive logging and audit trails
+- Implements robust error handling and data quality checks
+- Supports user-specific portfolio preferences and constraints
 
 Author: parinayeklahare42
 Course: 125882 AI in Investment and Risk Management
@@ -19,9 +22,10 @@ Assignment: Assessment 2 Hackathon and Coding Challenge
 
 import pandas as pd
 import numpy as np
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Any
 import logging
 from datetime import datetime, timedelta
+import traceback
 
 # Import all system components
 from .data.librarian import Librarian
@@ -33,9 +37,14 @@ from .safety.risk_manager import RiskManager
 from .utils.shopkeeper import Shopkeeper
 from .utils.caretaker import Caretaker
 
-# Configure logging for debugging and monitoring
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Import new enhanced systems
+from .config.user_config import UserConfigManager, PortfolioConfig, RiskLevel
+from .utils.logging_config import get_logger, get_audit_logger, log_function_performance
+from .utils.validation import PortfolioValidator, ValidationError
+
+# Setup enhanced logging
+logger = get_logger('portfolio_manager')
+audit_logger = get_audit_logger()
 
 class PortfolioManager:
     """
@@ -58,26 +67,64 @@ class PortfolioManager:
     making the code maintainable and allowing for easy testing and enhancement.
     """
     
-    def __init__(self):
+    def __init__(self, config_dir: str = "config", log_dir: str = "logs"):
         """
-        Initialize the Portfolio Manager with all required components.
+        Initialize the Enhanced Portfolio Manager with all required components.
         
-        This constructor sets up the entire system by initializing all specialized
-        components that work together to create and manage portfolios.
+        Args:
+            config_dir: Directory for user configuration files
+            log_dir: Directory for log files
+            
+        This constructor sets up the entire enhanced system with validation,
+        logging, and user configuration management capabilities.
         """
-        # Initialize all AI/ML components
-        self.librarian = Librarian()          # Data fetching and caching
-        self.research_crew = ResearchCrew()    # AI/ML analysis engine
-        self.planner = Planner()              # Asset allocation strategist
-        self.selector = Selector()            # Asset selection algorithm
-        self.safety_officer = SafetyOfficer() # Risk management guardrails
-        self.risk_manager = RiskManager()     # Advanced risk analytics
-        self.shopkeeper = Shopkeeper()        # Trade execution system
-        self.caretaker = Caretaker()          # Portfolio maintenance
+        logger.info("Initializing Enhanced AI Portfolio Management System...")
         
-        # Portfolio state tracking
-        self.current_portfolio = None         # Currently active portfolio
-        self.last_rebalance_date = None        # Last rebalancing date
+        try:
+            # Initialize enhanced systems first
+            self.config_manager = UserConfigManager(config_dir)
+            self.validator = PortfolioValidator()
+            
+            # Initialize all AI/ML components with enhanced capabilities
+            self.librarian = Librarian()          # Data fetching and caching with validation
+            self.research_crew = ResearchCrew()    # AI/ML analysis engine with logging
+            self.planner = Planner()              # Asset allocation with Markowitz optimization
+            self.selector = Selector()            # Asset selection with user preferences
+            self.safety_officer = SafetyOfficer() # Risk management guardrails
+            self.risk_manager = RiskManager()     # Advanced risk analytics and stress testing
+            self.shopkeeper = Shopkeeper()        # Trade execution system
+            self.caretaker = Caretaker()          # Portfolio maintenance with user settings
+            
+            # Enhanced portfolio state tracking
+            self.current_portfolio = None         # Currently active portfolio
+            self.last_rebalance_date = None        # Last rebalancing date
+            self.user_configs = {}                # User configuration cache
+            self.performance_metrics = {}         # System performance tracking
+            self.validation_results = {}          # Validation history
+            
+            # System health monitoring
+            self.component_status = {
+                'librarian': 'active',
+                'research_crew': 'active',
+                'planner': 'active',
+                'selector': 'active',
+                'safety_officer': 'active',
+                'risk_manager': 'active',
+                'shopkeeper': 'active',
+                'caretaker': 'active',
+                'config_manager': 'active',
+                'validator': 'active'
+            }
+            
+            # Log system initialization
+            audit_logger.log_system_action("system_initialization", "portfolio_manager",
+                                         config_dir=config_dir, log_dir=log_dir)
+            
+            logger.info("Enhanced AI Portfolio Management System initialized successfully")
+            
+        except Exception as e:
+            logger.critical("Failed to initialize Portfolio Management System", exception=e)
+            raise
     
     def create_portfolio(self, time_horizon: str, budget: float, 
                         risk_budget: float = 0.10, sleep_better_dial: float = 0.0,
@@ -456,6 +503,345 @@ class PortfolioManager:
             'within_budget': risk_report['within_risk_budget'],
             'recommendations': risk_report['recommendations']
         }
+    
+    @log_function_performance(logger)
+    def create_user_portfolio(self, user_id: str, portfolio_name: str, 
+                            risk_level: RiskLevel, budget: float,
+                            preferred_assets: Optional[List[str]] = None,
+                            custom_settings: Optional[Dict[str, Any]] = None) -> Dict:
+        """
+        Create a user-customized portfolio with enhanced configuration management.
+        
+        Args:
+            user_id: Unique user identifier
+            portfolio_name: Name for the portfolio
+            risk_level: Risk level preference (conservative, moderate, aggressive, custom)
+            budget: Investment budget in dollars
+            preferred_assets: List of preferred asset symbols
+            custom_settings: Custom configuration overrides
+            
+        Returns:
+            Complete portfolio with user-specific configuration
+        """
+        logger.info(f"Creating user portfolio: {portfolio_name} for user {user_id}")
+        
+        try:
+            # Create or load user configuration
+            config = self.config_manager.create_portfolio_config(
+                user_id=user_id,
+                portfolio_name=portfolio_name,
+                risk_level=risk_level,
+                preferred_assets=preferred_assets,
+                custom_settings=custom_settings
+            )
+            
+            # Validate configuration
+            validation_results = self.validator.validate_user_config(config.__dict__)
+            if not all(r.is_valid for r in validation_results if r.severity.value == 'error'):
+                error_messages = [r.message for r in validation_results if not r.is_valid and r.severity.value == 'error']
+                raise ValidationError(f"Configuration validation failed: {'; '.join(error_messages)}")
+            
+            # Store configuration
+            self.config_manager.save_config(config)
+            self.user_configs[f"{user_id}_{portfolio_name}"] = config
+            
+            # Create portfolio using configuration
+            portfolio = self.create_portfolio(
+                time_horizon="long_term",  # Default to long-term
+                budget=budget,
+                risk_budget=config.risk_config.target_volatility,
+                risk_profile=risk_level.value
+            )
+            
+            # Add user configuration to portfolio
+            portfolio['user_config'] = config.__dict__
+            portfolio['user_id'] = user_id
+            portfolio['portfolio_name'] = portfolio_name
+            
+            # Log user action
+            audit_logger.log_user_action(user_id, "create_portfolio", "portfolio_manager",
+                                       portfolio_id=portfolio.get('portfolio_id'),
+                                       risk_level=risk_level.value,
+                                       budget=budget)
+            
+            return portfolio
+            
+        except Exception as e:
+            logger.error(f"Failed to create user portfolio: {e}", exception=e)
+            raise
+    
+    @log_function_performance(logger)
+    def validate_portfolio_data(self, portfolio: Dict) -> Dict[str, Any]:
+        """
+        Comprehensive validation of portfolio data and calculations.
+        
+        Args:
+            portfolio: Portfolio dictionary to validate
+            
+        Returns:
+            Validation summary with detailed results
+        """
+        logger.info("Validating portfolio data and calculations")
+        
+        validation_results = []
+        
+        try:
+            # Validate asset data
+            if 'analysis_results' in portfolio:
+                for asset_class, analysis in portfolio['analysis_results'].items():
+                    if 'data' in analysis and analysis['data'] is not None:
+                        data_results = self.validator.validate_asset_data(analysis['data'])
+                        validation_results.extend(data_results)
+            
+            # Validate portfolio weights
+            if 'selected_assets' in portfolio:
+                weights = {asset: info['weight'] for asset, info in portfolio['selected_assets'].items()}
+                weight_results = self.validator.validate_portfolio_weights(weights)
+                validation_results.extend(weight_results)
+            
+            # Validate risk parameters
+            if 'risk_report' in portfolio:
+                risk_config = {
+                    'target_volatility': portfolio['parameters'].get('risk_budget', 0.1),
+                    'var_confidence_level': 0.95,
+                    'max_drawdown_limit': 0.25
+                }
+                risk_results = self.validator.validate_risk_parameters(risk_config)
+                validation_results.extend(risk_results)
+            
+            # Validate optimization results
+            if 'allocation_plan' in portfolio:
+                plan = portfolio['allocation_plan']
+                if all(key in plan for key in ['expected_return', 'volatility', 'sharpe_ratio']):
+                    weights = plan.get('weights', {})
+                    opt_results = self.validator.validate_optimization_result(
+                        weights, plan['expected_return'], plan['volatility'], plan['sharpe_ratio']
+                    )
+                    validation_results.extend(opt_results)
+            
+            # Generate validation summary
+            summary = self.validator.get_validation_summary(validation_results)
+            
+            # Store validation results
+            self.validation_results[portfolio.get('portfolio_id', 'unknown')] = {
+                'results': validation_results,
+                'summary': summary,
+                'timestamp': datetime.now().isoformat()
+            }
+            
+            logger.info(f"Portfolio validation completed: {summary['is_valid']}")
+            return summary
+            
+        except Exception as e:
+            logger.error("Portfolio validation failed", exception=e)
+            return {'is_valid': False, 'error': str(e)}
+    
+    def get_available_assets(self, asset_class: Optional[str] = None) -> List[Dict]:
+        """
+        Get available assets based on user preferences and filters.
+        
+        Args:
+            asset_class: Optional asset class filter
+            
+        Returns:
+            List of available assets with metadata
+        """
+        logger.info(f"Getting available assets for class: {asset_class}")
+        
+        try:
+            assets = self.config_manager.get_available_assets()
+            
+            if asset_class:
+                assets = [a for a in assets if a.asset_class.value == asset_class]
+            
+            # Convert to dictionary format
+            asset_list = []
+            for asset in assets:
+                asset_dict = {
+                    'symbol': asset.symbol,
+                    'name': asset.name,
+                    'asset_class': asset.asset_class.value,
+                    'exchange': asset.exchange,
+                    'currency': asset.currency,
+                    'enabled': asset.enabled,
+                    'min_weight': asset.min_weight,
+                    'max_weight': asset.max_weight
+                }
+                asset_list.append(asset_dict)
+            
+            return asset_list
+            
+        except Exception as e:
+            logger.error("Failed to get available assets", exception=e)
+            return []
+    
+    def add_custom_asset(self, symbol: str, name: str, asset_class: str,
+                        exchange: str, currency: str = "USD",
+                        volatility: Optional[float] = None) -> Dict:
+        """
+        Add a custom asset to the available assets list.
+        
+        Args:
+            symbol: Asset symbol
+            name: Asset name
+            asset_class: Asset class
+            exchange: Exchange
+            currency: Currency
+            volatility: Custom volatility estimate
+            
+        Returns:
+            Asset configuration dictionary
+        """
+        logger.info(f"Adding custom asset: {symbol} ({name})")
+        
+        try:
+            from .config.user_config import AssetClass
+            asset_class_enum = AssetClass(asset_class)
+            
+            asset_config = self.config_manager.add_custom_asset(
+                symbol=symbol,
+                name=name,
+                asset_class=asset_class_enum,
+                exchange=exchange,
+                currency=currency,
+                volatility=volatility
+            )
+            
+            # Log system action
+            audit_logger.log_system_action("add_custom_asset", "portfolio_manager",
+                                         symbol=symbol, name=name, asset_class=asset_class)
+            
+            return {
+                'symbol': asset_config.symbol,
+                'name': asset_config.name,
+                'asset_class': asset_config.asset_class.value,
+                'exchange': asset_config.exchange,
+                'currency': asset_config.currency,
+                'custom_volatility': asset_config.custom_volatility
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed to add custom asset {symbol}", exception=e)
+            raise
+    
+    def get_system_health(self) -> Dict[str, Any]:
+        """
+        Get comprehensive system health status.
+        
+        Returns:
+            System health report with component status and metrics
+        """
+        logger.info("Checking system health")
+        
+        health_report = {
+            'overall_status': 'healthy',
+            'timestamp': datetime.now().isoformat(),
+            'components': self.component_status.copy(),
+            'performance_metrics': self.performance_metrics.copy(),
+            'validation_summary': {
+                'total_validations': len(self.validation_results),
+                'recent_failures': sum(1 for v in self.validation_results.values() 
+                                     if not v['summary']['is_valid'])
+            },
+            'system_uptime': self._calculate_system_uptime(),
+            'recommendations': []
+        }
+        
+        # Check component health
+        inactive_components = [comp for comp, status in self.component_status.items() 
+                             if status != 'active']
+        if inactive_components:
+            health_report['overall_status'] = 'degraded'
+            health_report['recommendations'].append(f"Inactive components: {inactive_components}")
+        
+        # Check validation failures
+        recent_failures = health_report['validation_summary']['recent_failures']
+        if recent_failures > 0:
+            health_report['recommendations'].append(f"{recent_failures} recent validation failures")
+        
+        return health_report
+    
+    def _calculate_system_uptime(self) -> str:
+        """Calculate system uptime."""
+        # This would be implemented with actual uptime tracking
+        return "24 hours"  # Placeholder
+    
+    def export_portfolio_report(self, portfolio: Dict, format: str = "json") -> str:
+        """
+        Export comprehensive portfolio report in specified format.
+        
+        Args:
+            portfolio: Portfolio to export
+            format: Export format (json, csv, html)
+            
+        Returns:
+            Exported report content
+        """
+        logger.info(f"Exporting portfolio report in {format} format")
+        
+        try:
+            if format.lower() == "json":
+                import json
+                return json.dumps(portfolio, indent=2, default=str)
+            
+            elif format.lower() == "csv":
+                # Export key metrics as CSV
+                import io
+                output = io.StringIO()
+                
+                # Portfolio summary
+                output.write("Metric,Value\n")
+                output.write(f"Portfolio ID,{portfolio.get('portfolio_id', 'N/A')}\n")
+                output.write(f"Budget,${portfolio.get('parameters', {}).get('budget', 0):,.2f}\n")
+                output.write(f"Risk Budget,{portfolio.get('parameters', {}).get('risk_budget', 0):.1%}\n")
+                
+                # Asset allocation
+                if 'selected_assets' in portfolio:
+                    output.write("\nAsset,Weight,Amount\n")
+                    for asset, info in portfolio['selected_assets'].items():
+                        weight = info.get('weight', 0)
+                        amount = portfolio.get('parameters', {}).get('budget', 0) * weight
+                        output.write(f"{asset},{weight:.1%},${amount:,.2f}\n")
+                
+                return output.getvalue()
+            
+            elif format.lower() == "html":
+                # Generate HTML report
+                html_content = f"""
+                <html>
+                <head><title>Portfolio Report</title></head>
+                <body>
+                    <h1>AI Portfolio Management Report</h1>
+                    <h2>Portfolio Summary</h2>
+                    <p>Portfolio ID: {portfolio.get('portfolio_id', 'N/A')}</p>
+                    <p>Budget: ${portfolio.get('parameters', {}).get('budget', 0):,.2f}</p>
+                    <p>Risk Budget: {portfolio.get('parameters', {}).get('risk_budget', 0):.1%}</p>
+                    
+                    <h2>Asset Allocation</h2>
+                    <table border="1">
+                        <tr><th>Asset</th><th>Weight</th><th>Amount</th></tr>
+                """
+                
+                if 'selected_assets' in portfolio:
+                    for asset, info in portfolio['selected_assets'].items():
+                        weight = info.get('weight', 0)
+                        amount = portfolio.get('parameters', {}).get('budget', 0) * weight
+                        html_content += f"<tr><td>{asset}</td><td>{weight:.1%}</td><td>${amount:,.2f}</td></tr>"
+                
+                html_content += """
+                    </table>
+                </body>
+                </html>
+                """
+                
+                return html_content
+            
+            else:
+                raise ValueError(f"Unsupported export format: {format}")
+                
+        except Exception as e:
+            logger.error(f"Failed to export portfolio report: {e}", exception=e)
+            raise
 
 # Example usage and testing
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-The Portfolio Story - Demo Script
-Demonstrates the complete AI-powered portfolio management system
+The Portfolio Story - Enhanced Demo Script
+Demonstrates the complete AI-powered portfolio management system with enhanced features
 """
 
 import sys
@@ -13,25 +13,49 @@ sys.path.append('.')
 
 try:
     from portfolio_story.portfolio_manager import PortfolioManager
-    print("Portfolio Story system imported successfully!")
+    from portfolio_story.config.user_config import RiskLevel, UserConfigManager
+    from portfolio_story.utils.logging_config import setup_portfolio_logging
+    print("Enhanced Portfolio Story system imported successfully!")
 except ImportError as e:
     print(f"Import error: {e}")
     print("Please ensure all dependencies are installed: pip install -r requirements.txt")
     sys.exit(1)
 
 def main():
-    """Main demonstration function"""
+    """Main demonstration function with enhanced features"""
     print("=" * 60)
-    print("THE PORTFOLIO STORY - AI-POWERED INVESTMENT MANAGEMENT")
+    print("THE PORTFOLIO STORY - ENHANCED AI-POWERED INVESTMENT MANAGEMENT")
     print("=" * 60)
     print(f"Demo started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print()
     
     try:
-        # Initialize the Portfolio Manager
-        print("Initializing Portfolio Manager...")
-        pm = PortfolioManager()
-        print("Portfolio Manager initialized successfully!")
+        # Setup enhanced logging
+        print("Setting up enhanced logging system...")
+        loggers = setup_portfolio_logging(level="INFO")
+        print("Enhanced logging initialized successfully!")
+        
+        # Initialize the Enhanced Portfolio Manager
+        print("Initializing Enhanced Portfolio Manager...")
+        pm = PortfolioManager(config_dir="demo_config", log_dir="demo_logs")
+        print("Enhanced Portfolio Manager initialized successfully!")
+        print()
+        
+        # Demonstrate enhanced features
+        print("ENHANCED FEATURES DEMO")
+        print("-" * 40)
+        
+        # 1. User Configuration Management
+        print("1. User Configuration Management")
+        config_manager = UserConfigManager("demo_config")
+        available_assets = pm.get_available_assets(asset_class="equities")
+        print(f"   ✅ Available equity assets: {len(available_assets)}")
+        
+        # 2. System Health Monitoring
+        print("2. System Health Monitoring")
+        health_report = pm.get_system_health()
+        print(f"   ✅ System Status: {health_report['overall_status'].upper()}")
+        print(f"   ✅ Active Components: {len([c for c, s in health_report['components'].items() if s == 'active'])}")
         print()
         
         # Demo scenario: "Long term, $2,500"

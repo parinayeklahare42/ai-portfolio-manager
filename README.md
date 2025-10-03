@@ -1,21 +1,24 @@
-# 🚀 AI Portfolio Manager
+# 🚀 Enhanced AI Portfolio Manager
 
-**Advanced AI-powered investment portfolio management system with interactive web dashboard.**
+**Production-ready AI-powered investment portfolio management system with comprehensive validation, user configuration, and advanced analytics.**
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-ai--portfolio--dashboard.onrender.com-blue?style=for-the-badge&logo=render)](https://ai-portfolio-dashboard.onrender.com/)
 [![GitHub](https://img.shields.io/badge/GitHub-parinayeklahare42-green?style=for-the-badge&logo=github)](https://github.com/parinayeklahare42/ai-portfolio-manager)
 
 ## 🌟 Quick Overview
 
-An intelligent investment portfolio management system that combines AI/ML techniques with modern portfolio theory to create optimal investment strategies. Features an interactive Dash-based web interface with real-time visualizations, risk management, and professional-grade analytics.
+An enterprise-grade intelligent investment portfolio management system that combines advanced AI/ML techniques with Markowitz mean-variance optimization to create optimal investment strategies. Features comprehensive validation, user customization, advanced risk analytics, and professional-grade monitoring capabilities.
 
-## 🎯 Key Features
+## 🎯 Enhanced Key Features
 
-- **🤖 AI-Powered Analysis**: Machine learning models for risk assessment and price prediction
-- **📊 Interactive Dashboard**: Professional web interface with real-time visualizations
-- **⚖️ Portfolio Optimization**: Modern portfolio theory with AI enhancements
-- **🛡️ Risk Management**: Advanced risk metrics including VaR and drawdown analysis
-- **📈 Real-time Data**: Live market data integration with intelligent caching
+- **🤖 Advanced AI/ML Analysis**: Machine learning models with comprehensive validation and error handling
+- **📊 Interactive Dashboard**: Professional web interface with real-time visualizations and user customization
+- **⚖️ Markowitz Optimization**: Mean-variance optimization with Sharpe ratio maximization and risk targeting
+- **🛡️ Comprehensive Risk Management**: VaR, CVaR, stress testing, Monte Carlo simulation, and tail risk analytics
+- **📈 Real-time Data**: Live market data integration with intelligent caching and data quality validation
+- **👤 User Configuration**: Customizable asset selection, risk preferences, and portfolio constraints
+- **📝 Advanced Logging**: Comprehensive audit trails, performance monitoring, and system health tracking
+- **✅ Data Validation**: Robust input validation, constraint checking, and calculation verification
 
 ## 🚀 Live Demo
 
@@ -43,20 +46,27 @@ python run_dashboard.py
 python run_production.py
 ```
 
-## 📋 AI/ML Techniques
+## 📋 Enhanced AI/ML Techniques
 
-- **Random Forest & Gradient Boosting**: Price prediction and portfolio optimization
+- **Markowitz Mean-Variance Optimization**: Expected returns, covariance matrix, Sharpe ratio maximization
+- **Advanced Risk Analytics**: Monte Carlo VaR, stress testing, tail risk metrics, maximum drawdown analysis
+- **Random Forest & Gradient Boosting**: Price prediction with comprehensive validation
 - **Sentiment Analysis**: News and social media analysis using TextBlob and NLTK
-- **Modern Portfolio Theory**: Mean-variance optimization with risk-return analysis
-- **Technical Analysis**: RSI, MACD, and volatility indicators
+- **Portfolio Optimization**: Multiple objectives (Sharpe ratio, minimum variance, target volatility)
+- **Technical Analysis**: RSI, MACD, volatility indicators with statistical validation
 
-## 🏗️ Architecture
+## 🏗️ Enhanced Architecture
 
-- **Portfolio Manager**: Central orchestrator for portfolio creation
-- **Research Crew**: AI-powered asset analysis and research
-- **Safety Officer**: Risk management and guardrails
-- **Dashboard Interface**: Interactive web-based user interface
-- **Data Librarian**: Market data fetching and caching
+- **Portfolio Manager**: Central orchestrator with user configuration and validation
+- **Research Crew**: AI-powered asset analysis with comprehensive logging
+- **Planner**: Markowitz optimization engine with multiple objectives and constraints
+- **Risk Manager**: Advanced risk analytics with stress testing and Monte Carlo simulation
+- **Safety Officer**: Risk management guardrails with real-time monitoring
+- **Configuration Manager**: User preferences, asset selection, and constraint management
+- **Validation Framework**: Comprehensive data quality and calculation verification
+- **Logging System**: Audit trails, performance monitoring, and system health tracking
+- **Dashboard Interface**: Interactive web-based user interface with customization
+- **Data Librarian**: Market data fetching with caching and quality validation
 
 ## 📊 Supported Assets
 
@@ -66,12 +76,16 @@ python run_production.py
 - **Forex**: Major currency pairs
 - **Commodities**: Gold, oil, and other resources
 
-## 🔧 Dependencies
+## 🔧 Enhanced Dependencies
 
-- **Data Processing**: pandas, numpy, yfinance
-- **Machine Learning**: scikit-learn, textblob, nltk
+- **Core Data Processing**: pandas, numpy, yfinance
+- **Machine Learning & AI**: scikit-learn, textblob, nltk, scipy
+- **Advanced Analytics**: statsmodels, arch (ARCH/GARCH models)
+- **Data Validation**: pydantic, jsonschema, dataclasses-json
 - **Visualization**: plotly, matplotlib, seaborn
 - **Web Framework**: dash, dash-bootstrap-components
+- **Enhanced Logging**: structlog, colorama
+- **Configuration**: python-dotenv, configparser
 - **Production**: gunicorn, waitress
 
 ## 📚 Documentation
