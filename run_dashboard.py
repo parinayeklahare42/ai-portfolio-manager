@@ -14,9 +14,9 @@ try:
     from portfolio_story.ui.dashboard import app
     
     if __name__ == "__main__":
-        print("🚀 Starting AI Portfolio Manager Dashboard...")
-        print("📊 Dashboard will be available at: http://localhost:8050")
-        print("🛑 Press Ctrl+C to stop the dashboard")
+        print("Starting AI Portfolio Manager Dashboard...")
+        print("Dashboard will be available at: http://localhost:8050")
+        print("Press Ctrl+C to stop the dashboard")
         print("-" * 50)
         
     # Run the dashboard with performance optimizations
@@ -30,10 +30,10 @@ try:
     )
         
 except ImportError as e:
-    print(f"❌ Error importing dashboard: {e}")
-    print("💡 Make sure you're in the correct directory and all dependencies are installed")
-    print("💡 Run: pip install -r requirements.txt")
+    print(f"Error importing dashboard: {e}")
+    print("Make sure you're in the correct directory and all dependencies are installed")
+    print("Run: pip install -r requirements.txt")
     sys.exit(1)
 except Exception as e:
-    print(f"❌ Error starting dashboard: {e}")
+    print(f"Error starting dashboard: {e}")
     sys.exit(1)

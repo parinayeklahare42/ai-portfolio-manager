@@ -132,17 +132,17 @@ class PortfolioLogger:
     def log_performance(self, operation: str, duration: float, **metrics):
         """Log performance metrics for operations."""
         self.info(f"Performance: {operation} completed in {duration:.3f}s", 
-                 operation=operation, duration=duration, **metrics)
+                 op_name=operation, duration=duration, **metrics)
     
     def log_portfolio_action(self, action: str, portfolio_id: str, **details):
         """Log portfolio-related actions for audit trail."""
         self.info(f"Portfolio Action: {action}", 
-                 action=action, portfolio_id=portfolio_id, **details)
+                 action_type=action, portfolio_id=portfolio_id, **details)
     
     def log_optimization_result(self, method: str, objective_value: float, **details):
         """Log optimization results."""
         self.info(f"Optimization: {method} achieved objective {objective_value:.6f}", 
-                 method=method, objective_value=objective_value, **details)
+                 opt_method=method, objective_value=objective_value, **details)
 
 def setup_portfolio_logging(log_dir: str = "logs", level: str = "INFO") -> Dict[str, PortfolioLogger]:
     """
@@ -177,7 +177,7 @@ def setup_portfolio_logging(log_dir: str = "logs", level: str = "INFO") -> Dict[
     # Log system startup
     main_logger = loggers['portfolio_manager']
     main_logger.info("Portfolio Management System Logging Initialized", 
-                    log_dir=str(log_dir), level=level)
+                    log_dir=str(log_dir), log_level=level)
     
     return loggers
 

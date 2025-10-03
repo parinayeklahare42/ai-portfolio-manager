@@ -358,22 +358,6 @@ app.index_string = '''
                 margin-right: 5px; /* Ensure content doesn't touch right edge */
             }
             
-            .explanation-box {
-                background: rgba(255, 255, 255, 0.05);
-                backdrop-filter: blur(20px);
-                border-left: 4px solid #667eea;
-                padding: 20px 25px; /* Increased padding for better spacing */
-                margin: 15px 0; /* Better margin */
-                border-radius: 8px;
-                font-size: 1rem; /* Standard readable font size */
-                color: #e0e6ed;
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-                margin-left: 0; /* Remove extra margin */
-                margin-right: 0; /* Remove extra margin */
-                line-height: 1.5; /* Better line spacing */
-                word-wrap: break-word; /* Prevent text overflow */
-                overflow-wrap: break-word; /* Handle long words */
-            }
             
             .metric-card {
                 background: rgba(255, 255, 255, 0.05);
@@ -777,6 +761,158 @@ app.index_string = '''
                 from { opacity: 0; transform: translateY(20px); }
                 to { opacity: 1; transform: translateY(0); }
             }
+
+            /* Clean form styling */
+            .form-group {
+                margin-bottom: 25px;
+            }
+            
+            .form-label {
+                font-weight: 600;
+                margin-bottom: 8px;
+                display: block;
+            }
+            
+            .explanation-box {
+                background: rgba(255, 255, 255, 0.05);
+                backdrop-filter: blur(20px);
+                border-left: 4px solid #667eea;
+                padding: 20px 25px; /* Increased padding for better spacing */
+                margin: 15px 0; /* Better margin */
+                border-radius: 8px;
+                font-size: 1rem; /* Standard readable font size */
+                color: #e0e6ed;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                margin-left: 0; /* Remove extra margin */
+                margin-right: 0; /* Remove extra margin */
+                line-height: 1.5; /* Better line spacing */
+                word-wrap: break-word; /* Prevent text overflow */
+                overflow-wrap: break-word; /* Handle long words */
+            }
+
+            /* Enhanced Loading Indicators */
+            .loading-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 40px;
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+                border-radius: 16px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                margin: 20px 0;
+            }
+
+            .loading-spinner {
+                width: 60px;
+                height: 60px;
+                border: 4px solid rgba(255, 255, 255, 0.1);
+                border-left: 4px solid #4CAF50;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin-bottom: 20px;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+
+            .loading-text {
+                color: #4CAF50;
+                font-size: 18px;
+                font-weight: 600;
+                margin-bottom: 10px;
+                text-align: center;
+            }
+
+            .loading-subtext {
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 14px;
+                text-align: center;
+                max-width: 400px;
+                line-height: 1.5;
+            }
+
+            .progress-bar {
+                width: 100%;
+                max-width: 400px;
+                height: 6px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 3px;
+                overflow: hidden;
+                margin-top: 20px;
+            }
+
+            .progress-fill {
+                height: 100%;
+                background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+                border-radius: 3px;
+                animation: progressAnimation 3s ease-in-out infinite;
+            }
+
+            @keyframes progressAnimation {
+                0% { width: 0%; }
+                50% { width: 70%; }
+                100% { width: 100%; }
+            }
+
+            .processing-steps {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                margin-top: 20px;
+                width: 100%;
+                max-width: 400px;
+            }
+
+            .processing-step {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 8px 12px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 8px;
+                border-left: 3px solid transparent;
+                transition: all 0.3s ease;
+            }
+
+            .processing-step.active {
+                border-left-color: #4CAF50;
+                background: rgba(76, 175, 80, 0.1);
+            }
+
+            .processing-step.completed {
+                border-left-color: #8BC34A;
+                background: rgba(139, 195, 74, 0.1);
+            }
+
+            .step-icon {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                font-weight: bold;
+            }
+
+            .step-icon.pending {
+                background: rgba(255, 255, 255, 0.1);
+                color: rgba(255, 255, 255, 0.5);
+            }
+
+            .step-icon.active {
+                background: #4CAF50;
+                color: white;
+                animation: pulse 1.5s ease-in-out infinite;
+            }
+
+            .step-icon.completed {
+                background: #8BC34A;
+                color: white;
+            }
         </style>
     </head>
     <body>
@@ -872,7 +1008,7 @@ app.layout = html.Div([
                         clearable=False
                     ),
                     html.Div([
-                        html.Small("💡 Longer time horizons allow for more growth potential but also more risk. Choose based on when you'll need the money.", 
+                        html.Small("💡 Choose based on when you'll need the money. Longer horizons allow for more growth potential!", 
                                   style={'color': '#e0e6ed', 'fontStyle': 'italic', 'fontSize': '1rem', 'lineHeight': '1.5'})
                     ], className="explanation-box")
                 ], className="form-group"),
@@ -986,7 +1122,7 @@ def create_portfolio(n_clicks, time_horizon, budget, risk_budget, sleep_better_d
                                style={'color': 'rgba(255,255,255,0.9)', 'marginBottom': 10, 'fontSize': '1.1rem', 'lineHeight': '1.5'}),
                         html.Li("📈 Creates a balanced portfolio for your goals", 
                                style={'color': 'rgba(255,255,255,0.9)', 'marginBottom': 10, 'fontSize': '1.1rem', 'lineHeight': '1.5'}),
-                        html.Li("💡 Explains every decision in simple terms", 
+                        html.Li("📋 Provides detailed explanations for every decision", 
                                style={'color': 'rgba(255,255,255,0.9)', 'marginBottom': 10, 'fontSize': '1.1rem', 'lineHeight': '1.5'})
                     ], style={'color': 'rgba(255,255,255,0.9)', 'fontSize': '1.1rem'})
                 ])
@@ -994,19 +1130,41 @@ def create_portfolio(n_clicks, time_horizon, budget, risk_budget, sleep_better_d
         ]), html.Div()  # Empty loading indicator
     
     try:
-        # Show loading indicator
+        # Show enhanced loading indicator with progress steps
         loading_indicator = html.Div([
             html.Div([
                 html.Div([
-                    html.I(className="fas fa-spinner fa-spin", style={'fontSize': '2rem', 'color': '#667eea', 'marginBottom': '15px'}),
-                    html.H3("🤖 AI is Creating Your Portfolio...", style={'color': 'white', 'marginBottom': '10px'}),
-                    html.P("Analyzing market data, calculating optimal allocation, and generating predictions...", 
-                           style={'color': 'rgba(255,255,255,0.8)', 'fontSize': '1rem'}),
                     html.Div([
-                        html.Div(style={'width': '100%', 'height': '4px', 'backgroundColor': 'rgba(255,255,255,0.2)', 'borderRadius': '2px', 'overflow': 'hidden'}),
-                        html.Div(style={'width': '60%', 'height': '100%', 'backgroundColor': '#667eea', 'borderRadius': '2px', 'animation': 'loading 2s ease-in-out infinite'})
-                    ], style={'marginTop': '15px'})
-                ], style={'textAlign': 'center', 'padding': '40px'})
+                        html.Div(className="loading-spinner"),
+                        html.Div("🤖 AI Portfolio Analysis in Progress", className="loading-text"),
+                        html.Div("Our advanced AI is analyzing thousands of assets and creating your optimal portfolio. This may take 30-60 seconds.", className="loading-subtext"),
+                        html.Div([
+                            html.Div(className="progress-fill")
+                        ], className="progress-bar"),
+                        html.Div([
+                            html.Div([
+                                html.Div("1", className="step-icon pending"),
+                                html.Span("Fetching market data and analyzing assets")
+                            ], className="processing-step"),
+                            html.Div([
+                                html.Div("2", className="step-icon pending"),
+                                html.Span("Applying AI/ML algorithms for optimization")
+                            ], className="processing-step"),
+                            html.Div([
+                                html.Div("3", className="step-icon pending"),
+                                html.Span("Calculating risk metrics and safety checks")
+                            ], className="processing-step"),
+                            html.Div([
+                                html.Div("4", className="step-icon pending"),
+                                html.Span("Generating portfolio recommendations")
+                            ], className="processing-step"),
+                            html.Div([
+                                html.Div("5", className="step-icon pending"),
+                                html.Span("Finalizing results and preparing dashboard")
+                            ], className="processing-step")
+                        ], className="processing-steps")
+                    ], className="loading-container")
+                ], style={'textAlign': 'center', 'padding': '20px'})
             ], className="info-card")
         ])
         
@@ -1061,7 +1219,7 @@ def create_portfolio(n_clicks, time_horizon, budget, risk_budget, sleep_better_d
                                 style={'color': '#dc3545', 'textAlign': 'center', 'fontSize': '1.3rem'}),
                         html.P(f"Failed to create portfolio: {str(portfolio_error)}"),
                         html.P("This might be due to invalid parameters or system issues."),
-                        html.P("💡 Try adjusting your investment amount or risk level."),
+                        html.P("Try adjusting your investment amount or risk level."),
                         html.P("🔄 The system will retry automatically in a few seconds.")
                     ], className="info-card")
                 ]), html.Div()
@@ -1090,7 +1248,7 @@ def create_portfolio(n_clicks, time_horizon, budget, risk_budget, sleep_better_d
                             style={'color': '#dc3545', 'textAlign': 'center', 'fontSize': '1.3rem'}),
                     html.P(f"Failed to process portfolio data: {str(data_error)}"),
                     html.P("The portfolio was created but couldn't be displayed properly."),
-                    html.P("💡 Please try again with different parameters.")
+                    html.P("Please try again with different parameters.")
                 ], className="info-card")
             ]), html.Div()
         
@@ -1437,7 +1595,7 @@ def create_portfolio(n_clicks, time_horizon, budget, risk_budget, sleep_better_d
                         style={'color': '#dc3545', 'textAlign': 'center', 'fontSize': '1.3rem'}),
                 html.P(f"Something went wrong: {str(e)}"),
                 html.P("Please check your inputs and try again. Make sure all fields are filled correctly."),
-                html.P("💡 Tip: Try reducing your investment amount or risk level if you're getting errors.")
+                html.P("Tip: Try reducing your investment amount or risk level if you're getting errors.")
             ], className="info-card")
         ]), html.Div()  # Return empty loading indicator
 
@@ -1473,7 +1631,7 @@ def disable_button_during_processing(n_clicks):
 if __name__ == '__main__':
     print("🚀 Starting The Portfolio Story Dashboard...")
     print("🌐 Open your browser to http://127.0.0.1:8050")
-    print("💡 Perfect for beginners - everything is explained in simple terms!")
+    print("📋 All information is available via hover tooltips!")
     print("⚡ Optimized for performance with caching and timeout handling")
     
     # Configure app for better performance
