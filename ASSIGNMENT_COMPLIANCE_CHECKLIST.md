@@ -15,7 +15,8 @@ Based on the typical requirements for hackathon and coding challenges, here's a 
   - Random Forest for price prediction
   - Gradient Boosting for portfolio optimization
   - Sentiment analysis for market intelligence
-  - Modern Portfolio Theory with AI enhancements
+  - Professional 5-level risk system with volatility capping
+  - Industry-standard allocation algorithms with horizon tilt logic
 - **✅ Unique Value Proposition**: Combines traditional finance with cutting-edge AI
 - **✅ Market Impact**: Solves real problems for individual investors and advisors
 

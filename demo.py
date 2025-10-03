@@ -58,22 +58,34 @@ def main():
         print(f"   ✅ Active Components: {len([c for c, s in health_report['components'].items() if s == 'active'])}")
         print()
         
-        # Demo scenario: "Long term, $2,500"
+        # Demo scenario: "Long term, $2,500" with NEW Professional Allocation Logic
         print("Creating portfolio: 'Long term, $2,500'")
         print("   - Time Horizon: Long term")
         print("   - Budget: $2,500")
         print("   - Risk Budget: 10% volatility")
-        print("   - Sleep-Better Dial: 0.2 (slightly conservative)")
-        print("   - Risk Profile: Moderate")
+        print("   - Risk Level: 3 (Moderate)")
+        print("   - NEW: Professional-grade allocation with volatility capping!")
         print()
         
-        # Create the portfolio
+        # Show new risk-based allocation examples
+        print("NEW REALISTIC ALLOCATION LOGIC")
+        print("-" * 40)
+        print("   Risk Level 1 (Very Conservative): 55% Bonds, 20% Equity, 15% Cash")
+        print("   Risk Level 2 (Conservative): 45% Bonds, 30% Equity, 10% Cash") 
+        print("   Risk Level 3 (Moderate): 35% Bonds, 40% Equity, 7% Cash")
+        print("   Risk Level 4 (Aggressive): 25% Bonds, 55% Equity, 4% Cash")
+        print("   Risk Level 5 (Very Aggressive): 21% Bonds, 61% Equity, 2% Cash")
+        print("   ✅ NEW: Professional-grade allocation with volatility capping!")
+        print("   ✅ NEW: Realistic financial logic with proper risk-return profiles!")
+        print()
+        
+        # Create the portfolio using new allocation system
         portfolio = pm.create_portfolio(
             time_horizon="long_term",
             budget=2500,
             risk_budget=0.10,
-            sleep_better_dial=0.2,
-            risk_profile="moderate"
+            sleep_better_dial=3,  # Risk level 3 (Moderate)
+            risk_profile="new_allocation_system"
         )
         
         print("Portfolio created successfully!")

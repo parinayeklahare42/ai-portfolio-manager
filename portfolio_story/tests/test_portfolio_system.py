@@ -105,19 +105,44 @@ class TestPortfolioSystem(unittest.TestCase):
         self.assertLessEqual(sentiment, 1)
     
     def test_planner_allocation(self):
-        """Test Planner allocation functions"""
-        # Test base allocation creation
-        allocation = self.planner.create_base_allocation('long_term', 'moderate')
-        self.assertIsInstance(allocation, dict)
-        self.assertAlmostEqual(sum(allocation.values()), 1.0, places=2)
+        """Test Planner allocation functions with new professional 5-level risk system"""
+        # Test Level 1 (Very Conservative) - should have high bond allocation
+        level1_allocation = self.planner.create_base_allocation(1, 'medium')
+        self.assertIsInstance(level1_allocation, dict)
+        self.assertAlmostEqual(sum(level1_allocation.values()), 1.0, places=2)
+        self.assertGreater(level1_allocation.get('bonds', 0), 0.5)  # Should have >50% bonds
+        self.assertLess(level1_allocation.get('shares', 0), 0.3)   # Should have <30% shares
         
-        # Test sleep-better dial
-        adjusted = self.planner.apply_sleep_better_dial(allocation, 0.5)
+        # Test Level 3 (Moderate) - should be balanced
+        level3_allocation = self.planner.create_base_allocation(3, 'medium')
+        self.assertIsInstance(level3_allocation, dict)
+        self.assertAlmostEqual(sum(level3_allocation.values()), 1.0, places=2)
+        # Moderate should have balanced allocation
+        self.assertGreater(level3_allocation.get('shares', 0), 0.3)  # Should have >30% shares
+        self.assertLess(level3_allocation.get('bonds', 0), 0.5)      # Should have <50% bonds
+        
+        # Test Level 5 (Very Aggressive) - should have high equity allocation
+        level5_allocation = self.planner.create_base_allocation(5, 'medium')
+        self.assertIsInstance(level5_allocation, dict)
+        self.assertAlmostEqual(sum(level5_allocation.values()), 1.0, places=2)
+        self.assertGreater(level5_allocation.get('shares', 0), level5_allocation.get('bonds', 0))
+        self.assertGreater(level5_allocation.get('shares', 0), 0.5)  # Should have >50% shares
+        
+        # Test optimal allocation with volatility capping
+        optimal_result = self.planner.create_optimal_allocation(25000, 'medium', 5, 15.0)
+        self.assertIsInstance(optimal_result, dict)
+        self.assertIn('weights', optimal_result)
+        self.assertIn('predicted_vol_pct', optimal_result)
+        self.assertIn('risk_status', optimal_result)
+        self.assertAlmostEqual(sum(optimal_result['weights'].values()), 1.0, places=2)
+        
+        # Test sleep-better dial (legacy support)
+        adjusted = self.planner.apply_sleep_better_dial(level3_allocation, 0.5)
         self.assertIsInstance(adjusted, dict)
         self.assertAlmostEqual(sum(adjusted.values()), 1.0, places=2)
         
-        # Test risk budget
-        risk_adjusted = self.planner.apply_risk_budget(allocation, 0.10)
+        # Test risk budget (legacy support)
+        risk_adjusted = self.planner.apply_risk_budget(level3_allocation, 0.10)
         self.assertIsInstance(risk_adjusted, dict)
         self.assertAlmostEqual(sum(risk_adjusted.values()), 1.0, places=2)
     
@@ -216,7 +241,7 @@ class TestPortfolioSystem(unittest.TestCase):
         # This test simulates the complete workflow
         # Step 1: Create allocation plan
         allocation_plan = self.planner.create_portfolio_plan(
-            'long_term', 'moderate', 0.2, 0.10
+            'long', 3, 0.2, 0.10
         )
         self.assertIsInstance(allocation_plan, dict)
         self.assertIn('allocation', allocation_plan)
@@ -271,7 +296,7 @@ class TestPortfolioSystem(unittest.TestCase):
     def test_data_consistency(self):
         """Test data consistency across components"""
         # Test that allocation percentages are consistent
-        allocation = self.planner.create_base_allocation('long_term', 'moderate')
+        allocation = self.planner.create_base_allocation(3, 'long')
         self.assertAlmostEqual(sum(allocation.values()), 1.0, places=2)
         
         # Test that risk calculations are consistent

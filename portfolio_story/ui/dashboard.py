@@ -1021,17 +1021,16 @@ app.layout = html.Div([
                     html.Div([
                         dcc.Slider(
                             id='sleep-better-dial',
-                            min=0,
-                            max=1,
-                            step=0.1,
-                            value=0.3,
+                            min=1,
+                            max=5,
+                            step=1,
+                            value=3,
                             marks={
-                                0: {'label': '😰 Very Conservative', 'style': {'fontSize': '12px', 'color': '#ffffff', 'fontWeight': '600', 'textAlign': 'center', 'whiteSpace': 'nowrap', 'padding': '0 8px', 'margin': '0 4px'}},
-                                0.2: {'label': '😌 Conservative', 'style': {'fontSize': '12px', 'color': '#ffffff', 'fontWeight': '600', 'textAlign': 'center', 'whiteSpace': 'nowrap', 'padding': '0 6px', 'margin': '0 4px'}},
-                                0.4: {'label': '😊 Moderate', 'style': {'fontSize': '12px', 'color': '#ffffff', 'fontWeight': '600', 'textAlign': 'center', 'whiteSpace': 'nowrap', 'padding': '0 6px', 'margin': '0 4px'}},
-                                0.6: {'label': '😎 Aggressive', 'style': {'fontSize': '12px', 'color': '#ffffff', 'fontWeight': '600', 'textAlign': 'center', 'whiteSpace': 'nowrap', 'padding': '0 6px', 'margin': '0 4px'}},
-                                0.8: {'label': '🚀 Very Aggressive', 'style': {'fontSize': '12px', 'color': '#ffffff', 'fontWeight': '600', 'textAlign': 'center', 'whiteSpace': 'nowrap', 'padding': '0 8px', 'margin': '0 4px'}},
-                                1.0: {'label': '🎢 Extreme', 'style': {'fontSize': '12px', 'color': '#ffffff', 'fontWeight': '600', 'textAlign': 'center', 'whiteSpace': 'nowrap', 'padding': '0 6px', 'margin': '0 4px'}}
+                                1: {'label': '😰 Very Conservative', 'style': {'fontSize': '12px', 'color': '#ffffff', 'fontWeight': '600', 'textAlign': 'center', 'whiteSpace': 'nowrap', 'padding': '0 8px', 'margin': '0 4px'}},
+                                2: {'label': '😌 Conservative', 'style': {'fontSize': '12px', 'color': '#ffffff', 'fontWeight': '600', 'textAlign': 'center', 'whiteSpace': 'nowrap', 'padding': '0 6px', 'margin': '0 4px'}},
+                                3: {'label': '😊 Moderate', 'style': {'fontSize': '12px', 'color': '#ffffff', 'fontWeight': '600', 'textAlign': 'center', 'whiteSpace': 'nowrap', 'padding': '0 6px', 'margin': '0 4px'}},
+                                4: {'label': '😎 Aggressive', 'style': {'fontSize': '12px', 'color': '#ffffff', 'fontWeight': '600', 'textAlign': 'center', 'whiteSpace': 'nowrap', 'padding': '0 6px', 'margin': '0 4px'}},
+                                5: {'label': '🚀 Very Aggressive', 'style': {'fontSize': '12px', 'color': '#ffffff', 'fontWeight': '600', 'textAlign': 'center', 'whiteSpace': 'nowrap', 'padding': '0 8px', 'margin': '0 4px'}}
                             },
                             tooltip={"placement": "bottom", "always_visible": True}
                         )
@@ -1201,12 +1200,18 @@ def create_portfolio(n_clicks, time_horizon, budget, risk_budget, sleep_better_d
             # Create portfolio with timeout handling
             try:
                 print("Creating new portfolio...")
+                # Use the new 1-5 risk level system directly
+                risk_level = int(sleep_better_dial)  # Convert to integer (1-5)
+                
+                print(f"Using new allocation logic: risk_level={risk_level}, horizon={time_horizon}, budget=${budget}, max_vol={risk_budget}%")
+                
+                # Create portfolio using the new optimal allocation logic
                 portfolio = pm.create_portfolio(
                     time_horizon=time_horizon,
                     budget=budget,
                     risk_budget=risk_budget/100,  # Convert percentage to decimal
                     sleep_better_dial=sleep_better_dial,
-                    risk_profile="moderate"
+                    risk_profile="new_allocation_system"  # Flag to use new system
                 )
                 # Cache the result
                 cache_portfolio(cache_key, portfolio)
@@ -1231,9 +1236,10 @@ def create_portfolio(n_clicks, time_horizon, budget, risk_budget, sleep_better_d
             risk_report = portfolio.get('risk_report', {})
             safety_results = portfolio.get('safety_results', {})
             
-            # Ensure we have valid data
+            # Ensure we have valid data - use the actual allocation from the portfolio
             if not allocation:
-                allocation = {'stocks': 60, 'bonds': 30, 'cash': 10}
+                # This should not happen with the new allocation system, but keep as fallback
+                allocation = {'shares': 0.40, 'bonds': 0.35, 'cash': 0.07, 'commodities': 0.15, 'crypto': 0.03}
             if not buy_list:
                 buy_list = {'trade_orders': [], 'summary': {'num_assets': 0}}
             if not risk_report:

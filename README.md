@@ -13,7 +13,7 @@ An enterprise-grade intelligent investment portfolio management system that comb
 
 - **🤖 Advanced AI/ML Analysis**: Machine learning models with comprehensive validation and error handling
 - **📊 Interactive Dashboard**: Professional web interface with real-time visualizations and user customization
-- **⚖️ Markowitz Optimization**: Mean-variance optimization with Sharpe ratio maximization and risk targeting
+- **⚖️ Goal.docx Allocation Engine**: Exact implementation of professional allocation policy covering all 45 user input combinations with realistic asset allocation
 - **🛡️ Comprehensive Risk Management**: VaR, CVaR, stress testing, Monte Carlo simulation, and tail risk analytics
 - **📈 Real-time Data**: Live market data integration with intelligent caching and data quality validation
 - **👤 User Configuration**: Customizable asset selection, risk preferences, and portfolio constraints
@@ -48,7 +48,7 @@ python run_production.py
 
 ## 📋 Enhanced AI/ML Techniques
 
-- **Markowitz Mean-Variance Optimization**: Expected returns, covariance matrix, Sharpe ratio maximization
+- **Goal.docx Allocation Policy**: Professional allocation engine with 5 risk levels, 3 horizons, 3 volatility buckets covering all 45 user combinations
 - **Advanced Risk Analytics**: Monte Carlo VaR, stress testing, tail risk metrics, maximum drawdown analysis
 - **Random Forest & Gradient Boosting**: Price prediction with comprehensive validation
 - **Sentiment Analysis**: News and social media analysis using TextBlob and NLTK
@@ -59,7 +59,7 @@ python run_production.py
 
 - **Portfolio Manager**: Central orchestrator with user configuration and validation
 - **Research Crew**: AI-powered asset analysis with comprehensive logging
-- **Planner**: Markowitz optimization engine with multiple objectives and constraints
+- **Planner**: Goal.docx allocation engine with exact implementation of professional allocation policy
 - **Risk Manager**: Advanced risk analytics with stress testing and Monte Carlo simulation
 - **Safety Officer**: Risk management guardrails with real-time monitoring
 - **Configuration Manager**: User preferences, asset selection, and constraint management

@@ -72,43 +72,113 @@ class Planner:
     """
     
     def __init__(self):
-        # Risk preference to target volatility mapping (Requirement 2)
-        self.risk_volatility_mapping = {
-            'low': 0.05,        # 5% target volatility for low risk
-            'medium': 0.10,     # 10% target volatility for medium risk  
-            'high': 0.15,       # 15% target volatility for high risk
-            'conservative': 0.05,
-            'moderate': 0.10,
-            'aggressive': 0.15
+        # Annualized volatilities (reasonable long-run ballparks)
+        self.SIGMA = {
+            'cash': 0.005,
+            'bonds': 0.05,
+            'shares': 0.18,
+            'commodities': 0.22,
+            'crypto': 0.80
+        }
+        
+        # Symmetric correlation matrix
+        self.CORR = {
+            'cash': {'cash': 1, 'bonds': 0, 'shares': 0, 'commodities': 0, 'crypto': 0},
+            'bonds': {'cash': 0, 'bonds': 1, 'shares': 0.2, 'commodities': 0, 'crypto': 0},
+            'shares': {'cash': 0, 'bonds': 0.2, 'shares': 1, 'commodities': 0.4, 'crypto': 0.3},
+            'commodities': {'cash': 0, 'bonds': 0, 'shares': 0.4, 'commodities': 1, 'crypto': 0.3},
+            'crypto': {'cash': 0, 'bonds': 0, 'shares': 0.3, 'commodities': 0.3, 'crypto': 1}
+        }
+        
+        # Base allocation per risk level (sums ~1; adjust to your house view if needed)
+        self.BASE_BY_RISK = {
+            1: {'cash': 0.15, 'bonds': 0.55, 'shares': 0.20, 'commodities': 0.08, 'crypto': 0.02},  # Very Conservative
+            2: {'cash': 0.10, 'bonds': 0.45, 'shares': 0.30, 'commodities': 0.12, 'crypto': 0.03},  # Conservative
+            3: {'cash': 0.07, 'bonds': 0.35, 'shares': 0.40, 'commodities': 0.15, 'crypto': 0.03},  # Moderate
+            4: {'cash': 0.04, 'bonds': 0.25, 'shares': 0.55, 'commodities': 0.12, 'crypto': 0.04},  # Aggressive
+            5: {'cash': 0.02, 'bonds': 0.15, 'shares': 0.65, 'commodities': 0.10, 'crypto': 0.08}   # Very Aggressive
+        }
+        
+        # Horizon tilt deltas (from Goal.docx)
+        self.HORIZON_TILT = {
+            'short': {'cash': +0.03, 'bonds': +0.05, 'shares': -0.06, 'commodities': -0.015, 'crypto': -0.005},
+            'medium': {'cash': 0.00, 'bonds': 0.00, 'shares': 0.00, 'commodities': 0.000, 'crypto': 0.000},
+            'long': {'cash': -0.02, 'bonds': -0.05, 'shares': +0.05, 'commodities': +0.015, 'crypto': +0.005}
+        }
+        
+        # Volatility bucket tilt deltas (from Goal.docx)
+        self.VOL_TILT = {
+            'low': {'cash': +0.02, 'bonds': +0.08, 'shares': -0.07, 'commodities': -0.02, 'crypto': -0.01},
+            'mid': {'cash': 0.00, 'bonds': 0.00, 'shares': 0.00, 'commodities': 0.00, 'crypto': 0.00},
+            'high': {'cash': -0.02, 'bonds': -0.05, 'shares': +0.05, 'commodities': +0.015, 'crypto': +0.005}
+        }
+        
+        # Realistic hard caps/floors (from Goal.docx)
+        self.BOUNDS = {
+            'cashMin': 0.01,   # keep at least 1% cash for liquidity
+            'bondsMin': 0.10,  # bonds should not drop below 10% except the most aggressive corner
+            'bondsMinRisk5LongHigh': 0.05, # allow a lower bond floor in the single riskiest corner
+            'cryptoMaxLow': 0.10,   # keep crypto <10% when vol tolerance is low
+            'cryptoMaxMid': 0.12,   # <12% for mid
+            'cryptoMaxHigh': 0.15,  # up to 15% only in high bucket
+            'commoditiesMax': 0.15, # cap commodities to 15%,
         }
         
         # Risk-free rate for Sharpe ratio calculation
         self.risk_free_rate = 0.03  # 3% annual risk-free rate
-        
-        # Base allocation templates
-        self.allocation_templates = {
-            TimeHorizon.SHORT_TERM: {
-                'cash': 0.40,
-                'bonds': 0.45,
-                'shares': 0.10,
-                'commodities': 0.05,
-                'crypto': 0.00
-            },
-            TimeHorizon.MEDIUM_TERM: {
-                'cash': 0.20,
-                'bonds': 0.40,
-                'shares': 0.30,
-                'commodities': 0.08,
-                'crypto': 0.02
-            },
-            TimeHorizon.LONG_TERM: {
-                'cash': 0.05,
-                'bonds': 0.25,
-                'shares': 0.55,
-                'commodities': 0.10,
-                'crypto': 0.05
-            }
+    
+    def clamp(self, x: float, lo: float, hi: float) -> float:
+        """Clamp value between lo and hi (from Goal.docx)"""
+        return min(hi, max(lo, x))
+    
+    def clamp01(self, x: float) -> float:
+        """Clamp value between 0 and 1"""
+        return min(1.0, max(0.0, x))
+    
+    def normalize_weights(self, w: Dict[str, float]) -> Dict[str, float]:
+        """Normalize weights to sum to 1.0 (from Goal.docx)"""
+        total = w.get('cash', 0) + w.get('bonds', 0) + w.get('shares', 0) + w.get('commodities', 0) + w.get('crypto', 0)
+        if total <= 0:
+            total = 1.0
+        return {
+            'cash': w.get('cash', 0) / total,
+            'bonds': w.get('bonds', 0) / total,
+            'shares': w.get('shares', 0) / total,
+            'commodities': w.get('commodities', 0) / total,
+            'crypto': w.get('crypto', 0) / total
         }
+    
+    def apply_delta(self, w: Dict[str, float], d: Dict[str, float]) -> Dict[str, float]:
+        """Apply delta to weights (from Goal.docx)"""
+        return {
+            'cash': w.get('cash', 0) + d.get('cash', 0),
+            'bonds': w.get('bonds', 0) + d.get('bonds', 0),
+            'shares': w.get('shares', 0) + d.get('shares', 0),
+            'commodities': w.get('commodities', 0) + d.get('commodities', 0),
+            'crypto': w.get('crypto', 0) + d.get('crypto', 0)
+        }
+    
+    def vol_bucket(self, max_vol_pct: float) -> str:
+        """Map maxVolPct to volatility bucket (from Goal.docx)"""
+        if max_vol_pct < 30:
+            return "low"
+        elif max_vol_pct <= 60:
+            return "mid"
+        else:
+            return "high"
+    
+    def calculate_portfolio_volatility(self, w: Dict[str, float]) -> float:
+        """Calculate portfolio volatility percentage using SIGMA and CORR matrices"""
+        keys = ['cash', 'bonds', 'shares', 'commodities', 'crypto']
+        variance = 0.0
+        
+        for i, ki in enumerate(keys):
+            for j, kj in enumerate(keys):
+                variance += (w.get(ki, 0) * w.get(kj, 0) * 
+                           self.SIGMA[ki] * self.SIGMA[kj] * 
+                           self.CORR[ki][kj])
+        
+        return np.sqrt(variance) * 100  # Return as percentage
         
         # Risk profile adjustments
         self.risk_adjustments = {
@@ -129,41 +199,138 @@ class Planner:
             }
         }
     
-    def create_base_allocation(self, time_horizon: str, risk_profile: str = "moderate") -> Dict[str, float]:
+    def compute_policy_weights(self, horizon: str, risk_level: int, max_vol_pct: float) -> Dict[str, float]:
         """
-        Create base allocation based on time horizon and risk profile
+        Compute policy weights using the exact algorithm from Goal.docx
         
         Args:
-            time_horizon: 'short_term', 'medium_term', or 'long_term'
-            risk_profile: 'conservative', 'moderate', or 'aggressive'
+            horizon: "short", "medium", or "long"
+            risk_level: 1-5 (Very Conservative to Very Aggressive)
+            max_vol_pct: Maximum volatility percentage
+            
+        Returns:
+            Dict with normalized weights
+        """
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        logger.info(f"Computing policy weights: horizon={horizon}, risk_level={risk_level}, max_vol_pct={max_vol_pct}")
+        
+        # Step 1: Start from base by risk
+        w = self.BASE_BY_RISK[risk_level].copy()
+        logger.info(f"Step 1 - Base allocation: {w}")
+        
+        # Step 2: Apply horizon tilt
+        w = self.apply_delta(w, self.HORIZON_TILT[horizon])
+        logger.info(f"Step 2 - After horizon tilt: {w}")
+        
+        # Step 3: Apply volatility bucket tilt
+        bucket = self.vol_bucket(max_vol_pct)
+        w = self.apply_delta(w, self.VOL_TILT[bucket])
+        logger.info(f"Step 3 - After vol tilt ({bucket}): {w}")
+        
+        # Step 4: Apply bounds (clamp extreme assets to realistic caps/floors)
+        bonds_floor = self.BOUNDS['bondsMinRisk5LongHigh'] if (risk_level == 5 and horizon == "long" and bucket == "high") else self.BOUNDS['bondsMin']
+        crypto_cap = self.BOUNDS['cryptoMaxLow'] if bucket == "low" else (self.BOUNDS['cryptoMaxMid'] if bucket == "mid" else self.BOUNDS['cryptoMaxHigh'])
+        
+        w['cash'] = max(w['cash'], self.BOUNDS['cashMin'])
+        w['bonds'] = max(w['bonds'], bonds_floor)
+        w['crypto'] = min(w['crypto'], crypto_cap)
+        w['commodities'] = min(w['commodities'], self.BOUNDS['commoditiesMax'])
+        
+        logger.info(f"Step 4 - After bounds: {w}")
+        
+        # Step 5: Normalize to sum = 1
+        w = self.normalize_weights(w)
+        logger.info(f"Step 5 - After normalize: {w}")
+        
+        # Step 6: Presentation rounding for the pie
+        r = {
+            'cash': round(w['cash'] * 100) / 100,
+            'bonds': round(w['bonds'] * 100) / 100,
+            'shares': round(w['shares'] * 100) / 100,
+            'commodities': round(w['commodities'] * 100) / 100,
+            'crypto': round(w['crypto'] * 100) / 100,
+        }
+        
+        # Keep sum exactly 1 after rounding
+        w = self.normalize_weights(r)
+        logger.info(f"Step 6 - Final rounded weights: {w}")
+        
+        return w
+    
+    def create_optimal_allocation(self, capital: float, horizon: str, risk_level: int, max_vol_pct: float) -> Dict:
+        """
+        Create optimal allocation using the exact policy from Goal.docx
+        
+        Args:
+            capital: Investment capital amount
+            horizon: 'short', 'medium', 'long'
+            risk_level: 1-5 (1=Very Conservative, 5=Very Aggressive)
+            max_vol_pct: Maximum allowed volatility percentage (e.g., 15 for 15%)
+            
+        Returns:
+            Dictionary with allocation results
+        """
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        logger.info(f"Creating optimal allocation: capital={capital}, horizon={horizon}, risk_level={risk_level}, max_vol_pct={max_vol_pct}")
+        
+        try:
+            # Use the exact policy from Goal.docx
+            w = self.compute_policy_weights(horizon, risk_level, max_vol_pct)
+            
+            # Calculate final metrics
+            predicted_vol_pct = self.calculate_portfolio_volatility(w)
+            amount_invested = capital
+            cash_remaining = 0  # All capital is invested (cash slice is different from cash remaining)
+            assets_selected = sum(1 for weight in w.values() if weight > 0.001)
+            
+            # Risk status
+            risk_status = "Higher than target" if predicted_vol_pct > max_vol_pct else "Within target"
+            
+            result = {
+                'weights': w,
+                'predicted_vol_pct': predicted_vol_pct,
+                'amount_invested': amount_invested,
+                'cash_remaining': cash_remaining,
+                'assets_selected': assets_selected,
+                'risk_status': risk_status,
+                'risk_level': risk_level,
+                'horizon': horizon,
+                'max_vol_pct': max_vol_pct
+            }
+            
+            logger.info(f"Final allocation result: {result}")
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error creating optimal allocation: {e}")
+            # Return safe default allocation
+            return self.create_optimal_allocation(capital, horizon, 3, max_vol_pct)
+    
+    def create_base_allocation(self, risk_level: int, horizon: str = "medium") -> Dict[str, float]:
+        """
+        Create base allocation using the new 1-5 risk level system
+        
+        Args:
+            risk_level: 1-5 (1=Very Conservative, 5=Very Aggressive)
+            horizon: 'short', 'medium', 'long'
             
         Returns:
             Dictionary with asset class allocations
         """
-        try:
-            # Convert string inputs to enums
-            horizon_enum = TimeHorizon(time_horizon)
-            risk_enum = RiskProfile(risk_profile)
-            
-            # Get base allocation
-            base_allocation = self.allocation_templates[horizon_enum].copy()
-            
-            # Apply risk profile adjustments
-            risk_adj = self.risk_adjustments[risk_enum]
-            for asset_class, adjustment in risk_adj.items():
-                if asset_class in base_allocation:
-                    base_allocation[asset_class] += adjustment
-            
-            # Ensure allocations sum to 1.0 and are non-negative
-            base_allocation = self._normalize_allocation(base_allocation)
-            
-            logger.info(f"Created base allocation for {time_horizon} {risk_profile}")
-            return base_allocation
-            
-        except ValueError as e:
-            logger.error(f"Invalid input parameters: {e}")
-            # Return moderate long-term allocation as default
-            return self.allocation_templates[TimeHorizon.LONG_TERM].copy()
+        # Map horizon strings
+        horizon_map = {
+            'short_term': 'short',
+            'medium_term': 'medium', 
+            'long_term': 'long'
+        }
+        horizon = horizon_map.get(horizon, horizon)
+        
+        # Use the exact policy from Goal.docx with default volatility
+        return self.compute_policy_weights(horizon, risk_level, 45.0)  # Default mid-volatility
     
     def apply_sleep_better_dial(self, allocation: Dict[str, float], 
                               sleep_better_dial: float) -> Dict[str, float]:
@@ -279,22 +446,22 @@ class Planner:
         
         return allocation
     
-    def create_portfolio_plan(self, time_horizon: str, risk_profile: str = "moderate",
+    def create_portfolio_plan(self, time_horizon: str, risk_level: int = 3,
                             sleep_better_dial: float = 0.0, target_volatility: float = 0.10) -> Dict:
         """
-        Create complete portfolio plan
+        Create complete portfolio plan using new Goal.docx allocation system
         
         Args:
-            time_horizon: Investment time horizon
-            risk_profile: Risk tolerance
+            time_horizon: Investment time horizon ('short', 'medium', 'long')
+            risk_level: Risk level (1-5)
             sleep_better_dial: Additional risk adjustment (0-1)
             target_volatility: Target portfolio volatility
             
         Returns:
             Complete portfolio plan
         """
-        # Create base allocation
-        allocation = self.create_base_allocation(time_horizon, risk_profile)
+        # Create base allocation using new system
+        allocation = self.create_base_allocation(risk_level, time_horizon)
         
         # Apply sleep-better dial
         allocation = self.apply_sleep_better_dial(allocation, sleep_better_dial)
@@ -309,7 +476,7 @@ class Planner:
         return {
             'allocation': allocation,
             'time_horizon': time_horizon,
-            'risk_profile': risk_profile,
+            'risk_level': risk_level,
             'sleep_better_dial': sleep_better_dial,
             'target_volatility': target_volatility,
             'expected_volatility': expected_volatility,

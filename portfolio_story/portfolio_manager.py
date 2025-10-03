@@ -199,11 +199,40 @@ class PortfolioManager:
                     )
             
             # Step 3: Allocation Planning (The Planner)
-            # Create optimal asset allocation strategy based on Modern Portfolio Theory
+            # Create optimal asset allocation strategy using new specification logic
             logger.info("Step 3: Creating allocation plan...")
-            allocation_plan = self.planner.create_portfolio_plan(
-                time_horizon, risk_profile, sleep_better_dial, risk_budget
-            )
+            
+            if risk_profile == "new_allocation_system":
+                # Use the new 1-5 risk level allocation system
+                risk_level = int(sleep_better_dial)
+                horizon_map = {
+                    'short_term': 'short',
+                    'medium_term': 'medium',
+                    'long_term': 'long'
+                }
+                horizon = horizon_map.get(time_horizon, 'medium')
+                
+                # Create optimal allocation using new logic
+                optimal_result = self.planner.create_optimal_allocation(
+                    capital=budget,
+                    horizon=horizon,
+                    risk_level=risk_level,
+                    max_vol_pct=risk_budget * 100  # Convert to percentage
+                )
+                
+                # Convert to the expected format
+                allocation_plan = {
+                    'allocation': optimal_result['weights'],
+                    'predicted_vol_pct': optimal_result['predicted_vol_pct'],
+                    'risk_status': optimal_result['risk_status'],
+                    'assets_selected': optimal_result['assets_selected']
+                }
+                logger.info(f"New allocation system result: {allocation_plan}")
+            else:
+                # Use legacy system for backward compatibility
+                allocation_plan = self.planner.create_portfolio_plan(
+                    time_horizon, risk_profile, sleep_better_dial, risk_budget
+                )
             
             # Step 4: Asset Selection (The Selector)
             # Choose specific assets based on ML rankings and allocation targets

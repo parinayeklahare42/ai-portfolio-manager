@@ -37,14 +37,17 @@ This project creates an enterprise-grade intelligent investment portfolio manage
 - **Technical Analysis**: RSI, MACD, volatility indicators with statistical validation
 - **Monte Carlo Simulation**: Risk assessment and portfolio scenario analysis
 
-### 2. **Markowitz Mean-Variance Optimization**
+### 2. **Goal.docx Allocation Engine Implementation**
 
+- **5-Level Risk System**: Level 1 (Very Conservative: 55% bonds), Level 2 (Conservative: 45% bonds), Level 3 (Moderate: 35% bonds), Level 4 (Aggressive: 25% bonds), Level 5 (Very Aggressive: 21% bonds)
+- **Volatility Capping**: Iterative rebalancing to meet target volatility with automatic risk reduction
+- **Horizon Tilt Logic**: Short-term (safer), Medium-term (balanced), Long-term (riskier) adjustments
+- **Professional Constants**: Real-world volatility and correlation matrices (Cash: 0.5%, Bonds: 5%, Shares: 18%, Commodities: 22%, Crypto: 80%)
 - **Expected Returns Calculation**: Historical data analysis with statistical validation
 - **Covariance Matrix Estimation**: Sample covariance with shrinkage methods for stability
 - **Sharpe Ratio Maximization**: Optimal risk-adjusted return optimization
-- **Minimum Variance Optimization**: Risk minimization strategies
-- **Target Volatility Optimization**: Risk targeting with user-defined preferences
 - **Portfolio Constraints**: Non-negative weights, sum to 1, optional cash allocation
+- **Dashboard Integration**: 1-5 risk level slider with clear professional labels
 
 ### 3. **Advanced Risk Analytics**
 
@@ -231,7 +234,7 @@ ai-portfolio-manager/
 │   ├── data/
 │   │   └── librarian.py         # Data fetching and caching
 │   ├── models/
-│   │   ├── planner.py           # Portfolio planning algorithms
+│   │   ├── planner.py           # Professional 5-level risk system with volatility capping and industry-standard allocation
 │   │   ├── research_crew.py     # AI research and analysis
 │   │   └── selector.py          # Asset selection logic
 │   ├── safety/

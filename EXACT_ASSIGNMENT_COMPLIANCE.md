@@ -20,7 +20,7 @@ Based on the exact assignment requirements provided, here's a detailed analysis 
 - **✅ Innovation**: Novel approach combining traditional finance with modern AI
 
 #### **Specific Areas Covered** (as per assignment):
-- ✅ **Portfolio optimization with AI**: Modern Portfolio Theory + ML enhancements
+- ✅ **Portfolio optimization with AI**: Professional 5-level risk system with volatility capping and industry-standard allocation
 - ✅ **Risk assessment using ML models**: VaR, stress testing, risk scoring
 - ✅ **Sentiment analysis for stock predictions**: News and market sentiment integration
 - ✅ **Novel AI approach to forecast asset prices**: Random Forest price prediction
