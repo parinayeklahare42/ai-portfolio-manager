@@ -10,6 +10,7 @@ numpy>=1.26.0             # Numerical computing
 scikit-learn>=1.4.0       # Machine learning algorithms
 textblob>=0.17.1          # Natural language processing and sentiment analysis
 nltk>=3.8.1               # Natural language toolkit
+scipy>=1.11.0             # Scientific computing for portfolio optimization
 
 # Visualization & Dashboard
 matplotlib>=3.8.0         # Static plotting
