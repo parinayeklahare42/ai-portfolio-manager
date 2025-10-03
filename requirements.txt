@@ -20,7 +20,7 @@ jsonschema>=4.17.0        # JSON schema validation
 # Advanced Statistics & Risk Analytics
 statsmodels>=0.14.0       # Statistical models and econometrics
 arch>=5.3.0               # ARCH/GARCH models for volatility modeling
-pyfolio>=0.9.2            # Portfolio and risk analytics (if available)
+# pyfolio>=0.9.2          # Portfolio and risk analytics (commented out - Python 3.13 compatibility issue)
 
 # Visualization & Dashboard
 matplotlib>=3.8.0         # Static plotting
@@ -54,3 +54,6 @@ waitress>=2.1.0           # Alternative WSGI server
 # python-docx>=0.8.11    # DOCX processing (for idea content extraction)
 # redis>=4.5.0            # Caching and session management (for production)
 # celery>=5.3.0           # Distributed task queue (for background processing)
+
+# Note: pyfolio was removed due to Python 3.13 compatibility issues
+# The portfolio analytics functionality is implemented using other libraries
